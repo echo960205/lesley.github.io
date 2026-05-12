@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>小玥的好吃好吃口袋名單</title>
+
+<style>
+:root{
+    --cream:#f6f1e7;
+    --bar:#d9c3a6;
+    --deep:#4e3b2f;
+    --card:#fffaf4;
+}
+
+body{
+    margin:0;
+    font-family:"PingFang TC", sans-serif;
+    background:var(--cream);
+    color:var(--deep);
+}
+
+header{
+    text-align:center;
+    padding:20px;
+}
+
+header h1{
+    font-size:18px;
+}
+
+/* 上方按鈕 */
+.top{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-bottom:10px;
+}
+
+button{
+    border:none;
+    border-radius:999px;
+    padding:10px 14px;
+    background:var(--bar);
+    color:white;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+button:hover{
+    opacity:0.9;
+}
+
+/* 表單 */
+#form{
+    display:none;
+    background:var(--card);
+    margin:10px;
+    padding:12px;
+    border-radius:20px;
+}
+
+input, textarea{
+    width:100%;
+    margin:6px 0;
+    padding:10px;
+    border-radius:12px;
+    border:none;
+    background:#f3e7d8;
+    color:var(--deep);
+    box-sizing:border-box;
+}
+
+/* 類別 */
+.tags{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    font-size:13px;
+    margin:6px 0;
+}
+
+/* list */
+.list{
+    padding:10px;
+}
+
+/* card */
+.card{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:var(--bar);
+    border-radius:20px;
+    padding:12px;
+    margin:10px 0;
+    position:relative;
+}
+
+.info{
+    flex:1;
+    padding-right:10px;
+}
+
+.info h3{
+    margin:0;
+}
+
+.info p{
+    margin:2px 0;
+    font-size:12px;
+}
+
+.rating{
+    font-size:12px;
+    margin-top:4px;
+}
+
+.type{
+    font-size:11px;
+    opacity:0.8;
+}
+
+/* 圖片 */
+.img{
+    width:60px;
+    height:60px;
+    border-radius:14px;
+    object-fit:cover;
+}
+
+/* 三點 */
+.menu{
+    position:absolute;
+    right:8px;
+    top:6px;
+    cursor:pointer;
+    font-size:18px;
+}
+
+/* dropdown */
+.dropdown{
+    position:absolute;
+    right:8px;
+    top:30px;
+    background:white;
+    border-radius:12px;
+    overflow:hidden;
+    display:none;
+    box-shadow:0 5px 15px rgba(0,0,0,0.1);
+    z-index:10;
+}
+
+.dropdown div{
+    padding:10px 14px;
+    font-size:13px;
+    cursor:pointer;
+}
+
+.dropdown div:hover{
+    background:#f3e7d8;
+}
+
+/* 今天吃什麼 popup */
+#picker{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.2);
+    justify-content:center;
+    align-items:center;
+    z-index:100;
+}
+
+.picker-box{
+    background:#fffaf4;
+    padding:20px;
+    border-radius:24px;
+    width:80%;
+    max-width:320px;
+    text-align:center;
+}
+
+.picker-box h3{
+    margin-top:0;
+    color:var(--deep);
+}
+
+.picker-buttons{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    justify-content:center;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>*・°☆ 小玥的好吃好吃口袋名單 *・°☆</h1>
+</header>
+
+<div class="top">
+<button onclick="toggleForm()">＋ 新增</button>
+<button onclick="randomPick()">🎲 今天吃什麼</button>
+</div>
+
+<!-- 表單 -->
+<div id="form">
+
+<input id="name" placeholder="餐廳名稱">
+<input id="addr" placeholder="地址">
+
+<textarea id="memo" placeholder="心得"></textarea>
+
+<div class="tags">
+<label><input type="radio" name="type" value="早餐"> 早餐</label>
+<label><input type="radio" name="type" value="午餐"> 午餐</label>
+<label><input type="radio" name="type" value="點心"> 點心</label>
+<label><input type="radio" name="type" value="晚餐"> 晚餐</label>
+<label><input type="radio" name="type" value="宵夜"> 宵夜</label>
+</div>
+
+<input id="r1" placeholder="小玥評分">
+<input id="r2" placeholder="廖鑫鑫評分">
+
+<input type="file" id="img">
+
+<button onclick="add()">儲存</button>
+
+</div>
+
+<!-- 今天吃什麼 -->
+<div id="picker">
+
+    <div class="picker-box">
+
+        <h3>今天想吃什麼？</h3>
+
+        <div class="picker-buttons">
+
+            <button onclick="pickType('早餐')">早餐</button>
+            <button onclick="pickType('午餐')">午餐</button>
+            <button onclick="pickType('點心')">點心</button>
+            <button onclick="pickType('晚餐')">晚餐</button>
+            <button onclick="pickType('宵夜')">宵夜</button>
+            <button onclick="pickType('全部')">全部隨機</button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="list" id="list"></div>
+
+<script>
+
+let data = JSON.parse(localStorage.getItem("list")) || [];
+let editIndex = null;
+
+/* 開關表單 */
+function toggleForm(){
+
+    if(editIndex === null){
+        clearForm();
+    }
+
+    const f = document.getElementById("form");
+
+    f.style.display =
+        f.style.display==="block"
+        ? "none"
+        : "block";
+}
+
+/* 取得類別 */
+function getType(){
+    const t = document.querySelector('input[name="type"]:checked');
+    return t ? t.value : "未分類";
+}
+
+/* 清空表單 */
+function clearForm(){
+
+    document.getElementById("name").value="";
+    document.getElementById("addr").value="";
+    document.getElementById("memo").value="";
+    document.getElementById("r1").value="";
+    document.getElementById("r2").value="";
+    document.getElementById("img").value="";
+
+    document.querySelectorAll('input[name="type"]').forEach(r=>{
+        r.checked = false;
+    });
+
+    editIndex = null;
+}
+
+/* 新增 / 編輯 */
+function add(){
+
+    const name = document.getElementById("name").value;
+    const addr = document.getElementById("addr").value;
+    const memo = document.getElementById("memo").value;
+    const r1 = document.getElementById("r1").value;
+    const r2 = document.getElementById("r2").value;
+    const file = document.getElementById("img").files[0];
+    const type = getType();
+
+    if(!name){
+        alert("請填餐廳名稱");
+        return;
+    }
+
+    const save = (img)=>{
+
+        const item = {
+            name,
+            addr,
+            memo,
+            r1,
+            r2,
+            img,
+            type
+        };
+
+        if(editIndex !== null){
+
+            if(!img){
+                item.img = data[editIndex].img;
+            }
+
+            data[editIndex] = item;
+            editIndex = null;
+
+        }else{
+
+            data.unshift(item);
+
+        }
+
+        localStorage.setItem("list", JSON.stringify(data));
+
+        render();
+
+        clearForm();
+
+        document.getElementById("form").style.display = "none";
+    };
+
+    if(file){
+
+        const reader = new FileReader();
+
+        reader.onload = e => save(e.target.result);
+
+        reader.readAsDataURL(file);
+
+    }else{
+
+        save("");
+
+    }
+}
+
+/* 排序 */
+function sortData(){
+
+    const order = [
+        "早餐",
+        "午餐",
+        "點心",
+        "晚餐",
+        "宵夜",
+        "未分類"
+    ];
+
+    data.sort((a,b)=>
+        order.indexOf(a.type) - order.indexOf(b.type)
+    );
+}
+
+/* render */
+function render(){
+
+    sortData();
+
+    const list = document.getElementById("list");
+
+    list.innerHTML = "";
+
+    data.forEach((i,index)=>{
+
+        const div = document.createElement("div");
+
+        div.className = "card";
+
+        div.innerHTML = `
+            <div class="info">
+
+                <div class="type">
+                    🍽 ${i.type}
+                </div>
+
+                <h3>${i.name}</h3>
+
+                <p>📍 ${i.addr}</p>
+
+                <div class="rating">
+                    ⭐ 小玥：${i.r1 || "—"} / 廖鑫鑫：${i.r2 || "—"}
+                </div>
+
+                <p>${i.memo}</p>
+
+            </div>
+
+            <img class="img" src="${i.img || ''}">
+
+            <div class="menu" onclick="toggleMenu(${index})">
+                ⋯
+            </div>
+
+            <div class="dropdown" id="m${index}">
+                <div onclick="edit(${index})">編輯</div>
+                <div onclick="del(${index})">刪除</div>
+            </div>
+        `;
+
+        list.appendChild(div);
+
+    });
+}
+
+/* menu */
+function toggleMenu(i){
+
+    document.querySelectorAll(".dropdown").forEach(el=>{
+        el.style.display = "none";
+    });
+
+    const el = document.getElementById("m"+i);
+
+    el.style.display =
+        el.style.display==="block"
+        ? "none"
+        : "block";
+}
+
+/* 編輯 */
+function edit(i){
+
+    const it = data[i];
+
+    editIndex = i;
+
+    document.getElementById("name").value = it.name;
+    document.getElementById("addr").value = it.addr;
+    document.getElementById("memo").value = it.memo;
+    document.getElementById("r1").value = it.r1;
+    document.getElementById("r2").value = it.r2;
+
+    document.querySelectorAll('input[name="type"]').forEach(r=>{
+        r.checked = r.value === it.type;
+    });
+
+    document.getElementById("form").style.display = "block";
+}
+
+/* 刪除 */
+function del(i){
+
+    data.splice(i,1);
+
+    localStorage.setItem("list", JSON.stringify(data));
+
+    render();
+}
+
+/* 今天吃什麼 */
+function randomPick(){
+
+    document.getElementById("picker").style.display = "flex";
+}
+
+/* 選類型 */
+function pickType(type){
+
+    document.getElementById("picker").style.display = "none";
+
+    let pool = data;
+
+    if(type !== "全部"){
+        pool = data.filter(i=>i.type===type);
+    }
+
+    if(pool.length===0){
+        alert("這類還沒有餐廳！");
+        return;
+    }
+
+    const r = pool[Math.floor(Math.random()*pool.length)];
+
+    alert(
+        "🍴 今天吃：" + r.name +
+        "\n📍 " + r.addr
+    );
+}
+
+render();
+
+</script>
+
+</body>
+</html>
